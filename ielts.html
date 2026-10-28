@@ -1,0 +1,486 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>IELTS Practice</title>
+
+<!-- React + Babel + TailwindCSS (CDN) -->
+<script src="https://unpkg.com/react@18/umd/react.production.min.js" crossorigin></script>
+<script src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js" crossorigin></script>
+<script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+<script src="https://cdn.tailwindcss.com"></script>
+
+<style>
+  body { font-family: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif; }
+</style>
+</head>
+<body>
+<div id="root"></div>
+
+<script type="text/babel">
+const { useState, useEffect, useRef } = React;
+
+/* =====================================================
+   1. DỮ LIỆU ĐỀ THI
+===================================================== */
+const readingTests = [
+  {
+    id: 1,
+    title: "IELTS Reading Test 1",
+    description: "Academic Reading - Passage 1: The Rise of Urban Farming",
+    duration: 60,
+    passage: {
+      title: "The Rise of Urban Farming",
+      content: `Urban farming is the practice of cultivating, processing, and distributing food in or around urban areas. In recent years, this practice has grown rapidly as cities seek sustainable solutions to food security and environmental challenges. Rooftop gardens, community plots, and vertical farms are becoming common sights in many major cities around the world.
+
+Supporters argue that urban farming reduces transportation costs, improves air quality, and provides fresh produce to local residents. It also brings communities together and offers educational opportunities for children to learn about food production.
+
+However, critics point out that limited space and high land prices make large-scale urban farming difficult to sustain. There are also concerns about soil contamination in some urban areas, which can affect the safety of the produce.
+
+Despite these challenges, many governments are now offering incentives to encourage urban agriculture as part of broader green city initiatives. The future of urban farming will likely depend on how well cities can balance economic, environmental, and social priorities.`
+    },
+    questions: [
+      { id: 1, question: "What is the main topic of the passage?", options: ["A. The history of agriculture in rural areas", "B. The growth of urban farming and its challenges", "C. The economic benefits of vertical farms only", "D. Government policies on food imports"], correctAnswer: "B" },
+      { id: 2, question: "According to the passage, which of the following is a benefit of urban farming?", options: ["A. It increases transportation costs", "B. It reduces air quality in cities", "C. It provides fresh produce to local residents", "D. It makes land prices higher"], correctAnswer: "C" },
+      { id: 3, question: "What do critics say about urban farming?", options: ["A. It is always profitable for farmers", "B. Limited space and high land prices make it hard to sustain", "C. It has no environmental benefits", "D. Governments should ban urban farming"], correctAnswer: "B" }
+    ]
+  },
+  {
+    id: 2,
+    title: "IELTS Reading Test 2",
+    description: "Academic Reading - Passage 1: The History of Coffee",
+    duration: 60,
+    passage: {
+      title: "The History of Coffee",
+      content: `Coffee is one of the most widely consumed beverages in the world, but its origins are often misunderstood. According to popular legend, coffee was discovered in Ethiopia by a goat herder named Kaldi, who noticed that his goats became unusually energetic after eating red berries from a certain tree.
+
+From Ethiopia, coffee cultivation spread to the Arabian Peninsula, where it was first roasted and brewed in a way similar to modern methods. By the 15th century, coffee was being grown in Yemen and had become an important trade commodity.
+
+Coffee houses, known as qahveh khaneh, began to appear in cities across the Middle East. These establishments became important centers for social activity and intellectual exchange. People gathered there to listen to music, play chess, and discuss current events.
+
+European travelers brought coffee back to their home countries, and by the 17th century, coffee houses had spread across Europe. Some historians argue that coffee houses played a significant role in the Enlightenment, as they provided spaces where people could freely exchange ideas.
+
+Today, coffee is a global industry worth billions of dollars, and it continues to be an important part of daily life for millions of people worldwide.`
+    },
+    questions: [
+      { id: 1, question: "According to legend, who first discovered coffee?", options: ["A. A European traveler", "B. An Arabian merchant", "C. An Ethiopian goat herder named Kaldi", "D. A Yemeni farmer"], correctAnswer: "C" },
+      { id: 2, question: "What role did coffee houses play in the Middle East?", options: ["A. They were only used for trading coffee beans", "B. They became centers for social activity and intellectual exchange", "C. They were banned by local governments", "D. They were exclusively for wealthy merchants"], correctAnswer: "B" },
+      { id: 3, question: "Some historians link coffee houses to which historical movement?", options: ["A. The Industrial Revolution", "B. The Renaissance", "C. The Enlightenment", "D. The Agricultural Revolution"], correctAnswer: "C" }
+    ]
+  },
+  {
+    id: 3,
+    title: "IELTS Reading Test 3",
+    description: "Academic Reading - Passage 1: The Great Barrier Reef",
+    duration: 60,
+    passage: {
+      title: "The Great Barrier Reef",
+      content: `The Great Barrier Reef is the world's largest coral reef system, stretching over 2,300 kilometers off the coast of Queensland, Australia. It is composed of over 2,900 individual reefs and 900 islands, and it supports an extraordinary diversity of marine life.
+
+The reef is home to more than 1,500 species of fish, 400 species of hard coral, and 30 species of whales and dolphins. It is also an important habitat for endangered species such as the dugong and the large green sea turtle.
+
+In recognition of its outstanding natural value, the Great Barrier Reef was designated a UNESCO World Heritage Site in 1981. It is also one of Australia's most important tourist destinations, generating billions of dollars in revenue each year.
+
+However, the reef faces significant threats. Climate change, which causes ocean warming and acidification, is considered the greatest long-term threat. Coral bleaching events have become more frequent and severe in recent decades. Other threats include water pollution from agricultural runoff, coastal development, and outbreaks of crown-of-thorns starfish.
+
+Scientists and conservationists are working on various strategies to protect the reef, including reducing greenhouse gas emissions, improving water quality, and restoring damaged coral.`
+    },
+    questions: [
+      { id: 1, question: "How long is the Great Barrier Reef?", options: ["A. About 900 kilometers", "B. About 1,500 kilometers", "C. Over 2,300 kilometers", "D. Over 5,000 kilometers"], correctAnswer: "C" },
+      { id: 2, question: "When was the Great Barrier Reef designated a UNESCO World Heritage Site?", options: ["A. 1975", "B. 1981", "C. 1990", "D. 2000"], correctAnswer: "B" },
+      { id: 3, question: "What is considered the greatest long-term threat to the reef?", options: ["A. Tourism", "B. Overfishing", "C. Climate change", "D. Coastal development"], correctAnswer: "C" }
+    ]
+  }
+];
+
+/* =====================================================
+   2. MINI HASH ROUTER (thay cho react-router-dom)
+===================================================== */
+let lastResult = null; // biến module lưu kết quả bài làm gần nhất
+
+function useHashRoute() {
+  const [path, setPath] = useState(() => window.location.hash.slice(1) || "/");
+  useEffect(() => {
+    const handler = () => setPath(window.location.hash.slice(1) || "/");
+    window.addEventListener("hashchange", handler);
+    return () => window.removeEventListener("hashchange", handler);
+  }, []);
+  return path;
+}
+
+function navigate(to) {
+  window.location.hash = to;
+}
+
+/* =====================================================
+   3. LAYOUT
+===================================================== */
+function Layout({ children }) {
+  return (
+    <div className="min-h-screen flex flex-col bg-gray-50">
+      <header className="bg-blue-700 text-white shadow-md">
+        <div className="max-w-6xl mx-auto px-4 py-3 flex items-center justify-between">
+          <a href="#/" className="text-xl font-bold tracking-wide">🎓 IELTS Practice</a>
+          <nav className="text-sm">
+            <a href="#/" className="hover:text-blue-200 transition-colors">Trang chủ</a>
+          </nav>
+        </div>
+      </header>
+      <main className="flex-1">{children}</main>
+      <footer className="bg-gray-800 text-gray-300 text-center text-sm py-4">
+        © 2026 IELTS Practice — React + TailwindCSS
+      </footer>
+    </div>
+  );
+}
+
+/* =====================================================
+   4. HOME PAGE
+===================================================== */
+function Home() {
+  return (
+    <div className="py-10 px-4">
+      <div className="max-w-5xl mx-auto">
+        <div className="text-center mb-10">
+          <h1 className="text-4xl md:text-5xl font-bold text-blue-700 mb-3">IELTS Practice</h1>
+          <p className="text-gray-600 max-w-2xl mx-auto">
+            Luyện tập kỹ năng Reading với các đề thi mẫu. Chọn một đề bên dưới để bắt đầu làm bài.
+          </p>
+        </div>
+        <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
+          {readingTests.map((test) => (
+            <div key={test.id} className="bg-white rounded-xl shadow-md p-6 flex flex-col hover:shadow-xl transition-shadow border border-gray-100">
+              <div className="flex items-start justify-between mb-3">
+                <h2 className="text-lg font-semibold text-gray-800">{test.title}</h2>
+                <span className="text-xs bg-blue-100 text-blue-700 font-medium px-2 py-1 rounded-full shrink-0 ml-2">Reading</span>
+              </div>
+              <p className="text-gray-600 text-sm mb-4 flex-1">{test.description}</p>
+              <div className="flex items-center justify-between mt-auto">
+                <span className="text-xs text-gray-500">{test.questions.length} câu • {test.duration} phút</span>
+                <button onClick={() => navigate(`/test/${test.id}`)} className="bg-blue-600 hover:bg-blue-700 text-white text-sm font-medium px-4 py-2 rounded-lg transition-colors">
+                  Bắt đầu làm bài
+                </button>
+              </div>
+            </div>
+          ))}
+        </div>
+      </div>
+    </div>
+  );
+}
+
+/* =====================================================
+   5. TEST PAGE
+===================================================== */
+const TOTAL_TIME = 60 * 60; // 60 phút = 3600 giây
+
+function Test({ id }) {
+  const test = readingTests.find((t) => t.id === Number(id));
+
+  const [timeLeft, setTimeLeft] = useState(TOTAL_TIME);
+  const [answers, setAnswers] = useState({});
+  const submittedRef = useRef(false);
+
+  // Đồng hồ đếm ngược
+  useEffect(() => {
+    if (!test) { navigate("/"); return; }
+    if (timeLeft <= 0) return;
+    const timer = setTimeout(() => setTimeLeft((t) => t - 1), 1000);
+    return () => clearTimeout(timer);
+  }, [timeLeft, test]);
+
+  // Hết giờ -> tự nộp
+  useEffect(() => {
+    if (test && timeLeft === 0 && !submittedRef.current) {
+      handleSubmit(true);
+    }
+  }, [timeLeft, test]);
+
+  // Nộp bài
+  function handleSubmit(auto = false) {
+    if (!test || submittedRef.current) return;
+    submittedRef.current = true;
+    if (auto) alert("Hết giờ! Bài làm của bạn sẽ được nộp tự động.");
+    lastResult = {
+      answers,
+      testId: test.id,
+      timeSpent: TOTAL_TIME - timeLeft,
+      autoSubmitted: auto
+    };
+    navigate(`/result/${test.id}`);
+  }
+
+  if (!test) return null;
+
+  const formatTime = (secs) => {
+    const m = Math.floor(secs / 60).toString().padStart(2, "0");
+    const s = (secs % 60).toString().padStart(2, "0");
+    return `${m}:${s}`;
+  };
+
+  const handleSelect = (qId, opt) => {
+    if (submittedRef.current) return;
+    const letter = opt.trim().charAt(0);
+    setAnswers((prev) => ({ ...prev, [qId]: letter }));
+  };
+
+  const isWarning = timeLeft <= 5 * 60;
+  const answeredCount = Object.keys(answers).length;
+
+  return (
+    <div>
+      {/* Thanh đồng hồ sticky */}
+      <div className="sticky top-0 z-10 bg-white shadow-sm border-b border-gray-200">
+        <div className="max-w-6xl mx-auto px-4 py-3 flex items-center justify-between">
+          <div>
+            <h1 className="text-lg font-semibold text-gray-800">{test.title}</h1>
+            <p className="text-xs text-gray-500">Đã trả lời: {answeredCount}/{test.questions.length} câu</p>
+          </div>
+          <div className={`font-mono text-xl font-bold ${isWarning ? "text-red-600 animate-pulse" : "text-blue-700"}`}>
+            ⏱ {formatTime(timeLeft)}
+          </div>
+        </div>
+      </div>
+
+      {/* Layout 2 cột */}
+      <div className="max-w-6xl mx-auto px-4 py-6 grid grid-cols-1 md:grid-cols-2 gap-6">
+        {/* Cột trái: Passage */}
+        <div className="bg-white rounded-xl shadow p-6 md:sticky md:top-24 md:self-start md:max-h-[calc(100vh-7rem)] md:overflow-y-auto">
+          <h2 className="text-xl font-bold text-gray-800 mb-4">{test.passage.title}</h2>
+          <div className="text-gray-700 leading-relaxed space-y-3">
+            {test.passage.content.split("\n\n").map((p, i) => <p key={i}>{p}</p>)}
+          </div>
+        </div>
+
+        {/* Cột phải: Câu hỏi */}
+        <div className="bg-white rounded-xl shadow p-6">
+          <h2 className="text-xl font-bold text-gray-800 mb-4">Câu hỏi</h2>
+          <div className="space-y-6">
+            {test.questions.map((q, idx) => (
+              <div key={q.id} className="border-b border-gray-100 pb-4 last:border-0 last:pb-0">
+                <p className="font-medium text-gray-800 mb-3">{idx + 1}. {q.question}</p>
+                <div className="space-y-2">
+                  {q.options.map((opt) => {
+                    const letter = opt.trim().charAt(0);
+                    const isSelected = answers[q.id] === letter;
+                    return (
+                      <label
+                        key={letter}
+                        className={`flex items-start gap-3 p-3 rounded-lg border cursor-pointer transition-colors ${
+                          isSelected ? "bg-blue-50 border-blue-500" : "border-gray-200 hover:bg-gray-50"
+                        }`}
+                      >
+                        <input
+                          type="radio"
+                          name={`q-${q.id}`}
+                          value={opt}
+                          checked={isSelected}
+                          onChange={() => handleSelect(q.id, opt)}
+                          className="mt-1 accent-blue-600"
+                        />
+                        <span className="text-gray-700">{opt}</span>
+                      </label>
+                    );
+                  })}
+                </div>
+              </div>
+            ))}
+          </div>
+          <button
+            onClick={() => handleSubmit(false)}
+            className="mt-6 w-full bg-blue-600 hover:bg-blue-700 text-white font-semibold py-3 rounded-lg transition-colors"
+          >
+            Nộp bài
+          </button>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+/* =====================================================
+   6. RESULT PAGE
+===================================================== */
+function calculateBand(correct, total) {
+  if (total === 0) return 0;
+  const scaled = Math.round((correct / total) * 40);
+  if (scaled >= 39) return 9.0;
+  if (scaled >= 37) return 8.5;
+  if (scaled >= 35) return 8.0;
+  if (scaled >= 33) return 7.5;
+  if (scaled >= 30) return 7.0;
+  if (scaled >= 27) return 6.5;
+  if (scaled >= 23) return 6.0;
+  if (scaled >= 19) return 5.5;
+  if (scaled >= 15) return 5.0;
+  if (scaled >= 13) return 4.5;
+  if (scaled >= 10) return 4.0;
+  if (scaled >= 8) return 3.5;
+  if (scaled >= 6) return 3.0;
+  if (scaled >= 4) return 2.5;
+  if (scaled >= 3) return 2.0;
+  if (scaled >= 2) return 1.5;
+  if (scaled >= 1) return 1.0;
+  return 0;
+}
+
+function formatDuration(secs) {
+  const m = Math.floor(secs / 60);
+  const s = secs % 60;
+  return `${m} phút ${s.toString().padStart(2, "0")} giây`;
+}
+
+function Result({ id }) {
+  const test = readingTests.find((t) => t.id === Number(id));
+
+  useEffect(() => {
+    if (!test || !lastResult || lastResult.testId !== Number(id)) {
+      navigate("/");
+    }
+  }, [id, test]);
+
+  if (!test || !lastResult || lastResult.testId !== Number(id)) return null;
+
+  const { answers, timeSpent, autoSubmitted } = lastResult;
+  const total = test.questions.length;
+  const correctCount = test.questions.reduce(
+    (acc, q) => (answers[q.id] === q.correctAnswer ? acc + 1 : acc),
+    0
+  );
+  const band = calculateBand(correctCount, total);
+  const percent = Math.round((correctCount / total) * 100);
+
+  return (
+    <div className="py-10 px-4">
+      <div className="max-w-3xl mx-auto">
+        <h1 className="text-3xl font-bold text-center text-blue-700 mb-6">Kết quả bài làm</h1>
+
+        {autoSubmitted && (
+          <div className="bg-yellow-50 border border-yellow-300 text-yellow-800 rounded-lg p-3 mb-6 text-center text-sm">
+            ⏰ Bài làm đã được nộp tự động do hết giờ.
+          </div>
+        )}
+
+        {/* Thẻ tổng quan */}
+        <div className="bg-white rounded-xl shadow-md p-6 mb-6">
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 text-center">
+            <div>
+              <p className="text-sm text-gray-500 mb-1">Số câu đúng</p>
+              <p className="text-3xl font-bold text-green-600">{correctCount}/{total}</p>
+            </div>
+            <div>
+              <p className="text-sm text-gray-500 mb-1">Tỉ lệ đúng</p>
+              <p className="text-3xl font-bold text-blue-600">{percent}%</p>
+            </div>
+            <div>
+              <p className="text-sm text-gray-500 mb-1">Band ước lượng</p>
+              <p className="text-3xl font-bold text-purple-600">{band.toFixed(1)}</p>
+            </div>
+          </div>
+          <div className="mt-4 text-center text-sm text-gray-500">
+            Thời gian làm bài: {formatDuration(timeSpent)}
+          </div>
+        </div>
+
+        {/* Danh sách đáp án */}
+        <div className="bg-white rounded-xl shadow-md p-6 mb-6">
+          <h2 className="text-xl font-semibold text-gray-800 mb-4">Xem lại đáp án</h2>
+          <div className="space-y-4">
+            {test.questions.map((q, idx) => {
+              const userAnswer = answers[q.id] || null;
+              const isCorrect = userAnswer === q.correctAnswer;
+              const userOption = q.options.find((opt) => opt.trim().charAt(0) === userAnswer);
+              const correctOption = q.options.find((opt) => opt.trim().charAt(0) === q.correctAnswer);
+              return (
+                <div
+                  key={q.id}
+                  className={`rounded-lg border p-4 ${isCorrect ? "border-green-300 bg-green-50" : "border-red-300 bg-red-50"}`}
+                >
+                  <div className="flex items-start justify-between gap-3 mb-2">
+                    <p className="font-medium text-gray-800">{idx + 1}. {q.question}</p>
+                    <span className={`text-lg shrink-0 ${isCorrect ? "text-green-600" : "text-red-600"}`}>
+                      {isCorrect ? "✓" : "✗"}
+                    </span>
+                  </div>
+                  <div className="text-sm space-y-1 mt-2">
+                    <p className="text-gray-700">
+                      <span className="font-medium">Bạn chọn: </span>
+                      {userOption ? (
+                        <span className={isCorrect ? "text-green-700" : "text-red-700"}>{userOption}</span>
+                      ) : (
+                        <span className="text-gray-400 italic">(Không trả lời)</span>
+                      )}
+                    </p>
+                    {!isCorrect && (
+                      <p className="text-green-700">
+                        <span className="font-medium">Đáp án đúng: </span>
+                        {correctOption}
+                      </p>
+                    )}
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+        </div>
+
+        {/* Nút điều hướng */}
+        <div className="text-center flex flex-col sm:flex-row gap-3 justify-center">
+          <button
+            onClick={() => { lastResult = null; navigate(`/test/${test.id}`); }}
+            className="bg-green-600 hover:bg-green-700 text-white font-semibold px-6 py-3 rounded-lg transition-colors"
+          >
+            Làm lại đề này
+          </button>
+          <button
+            onClick={() => navigate("/")}
+            className="bg-blue-600 hover:bg-blue-700 text-white font-semibold px-6 py-3 rounded-lg transition-colors"
+          >
+            Về trang chủ
+          </button>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+/* =====================================================
+   7. 404 PAGE
+===================================================== */
+function NotFound() {
+  return (
+    <div className="min-h-[50vh] flex flex-col items-center justify-center text-gray-600 py-20">
+      <h1 className="text-2xl font-bold mb-2">404 - Không tìm thấy trang</h1>
+      <a href="#/" className="text-blue-600 underline">Về trang chủ</a>
+    </div>
+  );
+}
+
+/* =====================================================
+   8. APP + ROUTER
+===================================================== */
+function App() {
+  const path = useHashRoute();
+  const testMatch = path.match(/^\/test\/(\d+)$/);
+  const resultMatch = path.match(/^\/result\/(\d+)$/);
+
+  let content;
+  if (path === "/" || path === "") {
+    content = <Home />;
+  } else if (testMatch) {
+    content = <Test id={testMatch[1]} />;
+  } else if (resultMatch) {
+    content = <Result id={resultMatch[1]} />;
+  } else {
+    content = <NotFound />;
+  }
+
+  return <Layout>{content}</Layout>;
+}
+
+const root = ReactDOM.createRoot(document.getElementById("root"));
+root.render(<App />);
+</script>
+</body>
+</html>
